@@ -8,7 +8,9 @@ import websocket
 import bFSocketWrapper
 def onMsgMethod(data):
     print(data)
-bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",on_message=onMsgMethod)
+    
+bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc")
+
 
 """
 こっちでデータ処理の関数書いてWrapperにimport

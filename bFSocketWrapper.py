@@ -8,7 +8,7 @@ import time
 import websocket
 from time import sleep
 from logging import getLogger,INFO,StreamHandler
-import MainProcess
+#import MainProcess
 logger = getLogger(__name__)
 handler = StreamHandler()
 handler.setLevel(INFO)
@@ -31,7 +31,7 @@ class RealtimeAPI(object):
         
         #Define Websocket
         
-        self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=MainProcess.onMsgMethod, on_error=self.on_error, on_close=self.on_close)
+        self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=MsgMethod, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
 
     def run(self):
