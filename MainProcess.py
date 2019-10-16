@@ -6,13 +6,25 @@ Created on Wed Oct 16 08:35:37 2019
 """
 import websocket
 import bFSocketWrapper
-
-
+bitflyerlog = []
     
-bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",onMsgMethod=bFSocketWrapper.onMsgMethod)
+bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=bFSocketWrapper.onMsgMethod)
 bF.run()
+bFOutput = bFSocketWrapper.recent_trades()
+print(bFOutput)
+
+
 while True:
-    print(1)
+    bitflyerlog.append(bFSocketWrapper.recent_trades())
+    if len(bitflyerlog) < 2:
+        print(1)
+        print(bitflyerlog)
+    elif len(bitflyerlog) >= 2:
+        if bitflyerlog[0] == bitflyerlog[1]:
+            bitflyerlog.pop(0)
+        elif bitflyerlog[0] != bitflyerlog[1]:
+            bitflyerlog.pop(0)
+            print(bitflyerlog)
 
 """
 こっちでデータ処理の関数書いてWrapperにimport     ←これにこだわる必要なくない？>>30
@@ -34,4 +46,6 @@ Wrapperで受け取ったデータをWrapperで定義したonMsgMethodで～～�
 >>30の方法だと"いろんな取引所のデーターを総合してシグナルとしてトレードしたいなら、ラッパー内に置くのはデーター成型くらいにして、エッジになる判定とかはメインで書いたほうが、あとあと面倒にならないです"
 も問題ないし、そもそも為替さんに指摘してもらったwsをラッパーで呼び出すってことで一つのスレッドできてね？ってのも解決できる
 向こうで定義してるから余計な問題も出ない
+
+結局、向こうのon_messageに処理書くのと同じことになって地球一周してきた感が否めない
 """

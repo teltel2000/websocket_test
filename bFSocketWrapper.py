@@ -25,7 +25,7 @@ This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 class RealtimeAPI(object):
     def __init__(self, url, onMsgMethod):
         self.url = url
-        
+        self.data = {}
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=onMsgMethod, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -55,9 +55,9 @@ class RealtimeAPI(object):
     Below are callback functions of websocket.
     """
     # when we get message
-    def on_message(self, ws, message):
+ #   def on_message(self, ws, message):
 
-        self.data = json.loads(message)#websocket受信イベント
+   #     self.data = json.loads(message)#websocket受信イベント
         #logger.info(output)
 
     # when error occurs
@@ -73,34 +73,28 @@ class RealtimeAPI(object):
         logger.info('connected streaming server')
         output_json = json.dumps(
             {'method' : 'subscribe',
-            'params' : {'channel' : 'lightning_executions_FX_BTC_JPY'}
+            'params' : {'channel' : self.channel}
             }
         )
         output_json2 = json.dumps(
             {'method' : 'subscribe',
-            'params' : {'channel' : "lightning_board_FX_BTC_JPY"}
+            'params' : {'channel' : self.channel2}
             }
         )
 
         ws.send(output_json)
         ws.send(output_json2)
         
-    def recent_trades(self):
-        return self.data
-
-def onMsgMethod(ws,message):
-    data = json.loads(message)
-    logger.info(data)
-    
-    
-            
-if __name__ == '__main__':
-    #API endpoint
     url = 'wss://ws.lightstream.bitflyer.com/json-rpc'
     channel = 'lightning_executions_FX_BTC_JPY'
     channel2 = "lightning_board_FX_BTC_JPY"
-    json_rpc = RealtimeAPI(url=url, channel=channel, channel2=channel2)
-
-    #ctrl + cで終了
-    json_rpc.run()
     
+        
+def recent_trades():
+    return RealtimeAPI.data
+
+def onMsgMethod(ws,message):
+    RealtimeAPI.data = json.loads(message)
+    #logger.info(data)
+    
+
