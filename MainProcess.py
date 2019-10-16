@@ -10,7 +10,8 @@ def onMsgMethod(self, ws, message):
     print(message)
     
 bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",onMsgMethod=onMsgMethod)
-
+bF.run()
+print(3)
 
 """
 こっちでデータ処理の関数書いてWrapperにimport
