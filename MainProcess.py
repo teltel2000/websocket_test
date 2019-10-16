@@ -9,7 +9,7 @@ import bFSocketWrapper
 def onMsgMethod(data):
     print(data)
     
-bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc")
+bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",on_message=onMsgMethod)
 
 
 """
@@ -20,5 +20,10 @@ Wrapper側で受け取ったデータの処理をimportした関数、MainProces
 結果をクラスか何かにしてこっちで呼び出して加工して使う？
 
 今は実際に稼働させるとmodule "bFSocketWrapper" has no attribute "RealtimeAPI"のエラーが出る
+
+やっぱりimportしあうとエラーが出るっぽい
+となるとどうやって向こうにメソッドを入れるのか分からない
+abcdaみたいに片手渡しで一周させるとエラー回避できそうだけどそうじゃない
+
 
 """
