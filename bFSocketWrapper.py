@@ -8,7 +8,7 @@ import time
 import websocket
 from time import sleep
 from logging import getLogger,INFO,StreamHandler
-#import MainProcess
+import MainProcess
 logger = getLogger(__name__)
 handler = StreamHandler()
 handler.setLevel(INFO)
