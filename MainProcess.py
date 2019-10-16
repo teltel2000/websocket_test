@@ -6,10 +6,17 @@ Created on Wed Oct 16 08:35:37 2019
 """
 import websocket
 import bFSocketWrapper
-output = {}
-output = bFSocketWrapper.BFWS.recent_trades()
-def onMsgMethod(output):
-    print(output)
-bFjson_rpc = websocket.WebSocketApp(url="wss://ws.lightstream.bitflyer.com/json-rpc",header=None,on_open=bFSocketWrapper.BFWS.on_open, on_message=onMsgMethod(output), on_error=bFSocketWrapper.BFWS.on_error, on_close=bFSocketWrapper.BFWS.on_close)
-    
-    
+def onMsgMethod(data):
+    print(data)
+bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",on_message=onMsgMethod)
+
+"""
+こっちでデータ処理の関数書いてWrapperにimport
+で、websocket起動、on_messageをonMsgMethodに指定
+
+Wrapper側で受け取ったデータの処理をimportした関数、MainProcess.onMsgMethod(data)で行う
+結果をクラスか何かにしてこっちで呼び出して加工して使う？
+
+今は実際に稼働させるとmodule "bFSocketWrapper" has no attribute "RealtimeAPI"のエラーが出る
+
+"""
