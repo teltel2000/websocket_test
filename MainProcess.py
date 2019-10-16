@@ -6,10 +6,10 @@ Created on Wed Oct 16 08:35:37 2019
 """
 import websocket
 import bFSocketWrapper
-def onMsgMethod(data):
-    print(data)
+def onMsgMethod(self, ws, message):
+    print(message)
     
-bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",on_message=onMsgMethod)
+bF = bFSocketWrapper.RealtimeAPI(url="wss://ws.lightstream.bitflyer.com/json-rpc",onMsgMethod=onMsgMethod)
 
 
 """
@@ -24,6 +24,4 @@ Wrapper側で受け取ったデータの処理をimportした関数、MainProces
 やっぱりimportしあうとエラーが出るっぽい
 となるとどうやって向こうにメソッドを入れるのか分からない
 abcdaみたいに片手渡しで一周させるとエラー回避できそうだけどそうじゃない
-
-向こうに
 """

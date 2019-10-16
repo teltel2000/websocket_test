@@ -8,7 +8,7 @@ import time
 import websocket
 from time import sleep
 from logging import getLogger,INFO,StreamHandler
-import MainProcess
+#import MainProcess
 logger = getLogger(__name__)
 handler = StreamHandler()
 handler.setLevel(INFO)
@@ -25,13 +25,11 @@ This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 class RealtimeAPI(object):
     def __init__(self, url,onMsgMethod):
         self.url = url
-        self.channel = channel
-        self.channel2 = channel2
         self.data = {}
         
         #Define Websocket
         
-        self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=onMsgMethod, on_error=self.on_error, on_close=self.on_close)
+        self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
 
     def run(self):
@@ -61,6 +59,7 @@ class RealtimeAPI(object):
     # when we get message
     def on_message(self, ws, message):
         self.data = json.loads(message)#websocket受信イベント
+        onMsgMethod(message)
         #logger.info(output)
 
     # when error occurs
