@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 26 07:42:49 2018
 
+@author: motoi
+"""
 
-
+import requests
+import csv
 import threading
 import json
 import time
 import websocket
 from time import sleep
 from logging import getLogger,INFO,StreamHandler
-#import MainProcess
 logger = getLogger(__name__)
 handler = StreamHandler()
 handler.setLevel(INFO)
@@ -23,9 +27,10 @@ logger.addHandler(handler)
 This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 """
 class RealtimeAPI(object):
-    def __init__(self, url, onMsgMethod4bF):
+    def __init__(self, url,onMsgMethod4finex):
         self.url = url
-        self.onMsgMethod4bF = onMsgMethod4bF
+        self.onMsgMethod4finex=onMsgMethod4finex
+        
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -56,9 +61,8 @@ class RealtimeAPI(object):
     """
     # when we get message
     def on_message(self, ws, message):
-
-        self.data = json.loads(message)#websocket受信イベント
-        self.onMsgMethod4bF(self.data)
+        self.data = json.loads(message)
+        self.onMsgMethod4finex(self.data)
         #logger.info(output)
 
     # when error occurs
@@ -72,23 +76,28 @@ class RealtimeAPI(object):
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')
+        
         output_json = json.dumps(
-            {'method' : 'subscribe',
-            'params' : {'channel' : self.channel}
+            {'event' : 'subscribe',
+            'channel' : "trades",
+            "symbol" : "tBTCUSD"
             }
         )
+        
         output_json2 = json.dumps(
-            {'method' : 'subscribe',
-            'params' : {'channel' : self.channel2}
+            {'event' : 'subscribe',
+            'channel' : "book",
+            "symbol" : "tBTCUSD"
             }
         )
-
+        output_json3 = json.dumps(
+                {"event":"subscribe",
+                 "channel":"ticker",
+                 "symbol":"tBTCUSD"})
+        
         ws.send(output_json)
         ws.send(output_json2)
+        ws.send(output_json3)
         
-    url = 'wss://ws.lightstream.bitflyer.com/json-rpc'
-    channel = 'lightning_executions_FX_BTC_JPY'
-    channel2 = "lightning_board_FX_BTC_JPY"
-
-
-
+    url = 'wss://api-pub.bitfinex.com/ws/2'
+    
