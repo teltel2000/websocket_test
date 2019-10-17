@@ -12,21 +12,12 @@ import bitfinex_websocket
 import threading
 data_bF = []
 data_mex = []
-data_finex = []
+data_finex = [] 
 a = 0
 def onMsgMethod4bF(message):
     global data_bF
-    data_bF.append(message)
-    """
-    if len(data_bF) > 1000:
-        data_bF.pop(0)
-    if threading.Event.is_set("params" in data_bF):
-        if threading.Event.is_set(len(data_bF[-1]["params"]["message"]) > 2):
-            for i in range(0,len(data_bF[-1]["params"]["message"])):
-                if data_bF[-1]["params"]["message"][i]["side"] == "BUY":
-                    if data_bF[-1]["params"]["message"][i]["size"] > 1:
-                        print("買います")
-     """               
+    if data_bF
+    data_bF.append(message)       
     
     #print(message)
 def onMsgMethod4mex(message):
@@ -56,5 +47,14 @@ bF.run()
 mex.get_instrument()
 finex.run()
 
-
+"""
+    if len(data_bF) > 1000:
+        data_bF.pop(0)
+    if threading.Event.is_set("params" in data_bF):
+        if threading.Event.is_set(len(data_bF[-1]["params"]["message"]) > 2):
+            for i in range(0,len(data_bF[-1]["params"]["message"])):
+                if data_bF[-1]["params"]["message"][i]["side"] == "BUY":
+                    if data_bF[-1]["params"]["message"][i]["size"] > 1:
+                        print("買います")
+"""       
 #threading.Thread(target=Allrun())
