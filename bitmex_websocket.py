@@ -7,7 +7,7 @@ import logging
 import urllib
 import math
 from util.api_key import generate_nonce, generate_signature
-
+data_mex = []
 
 # Naive implementation of connecting to BitMEX websocket for streaming realtime data.
 # The Marketmaker still interacts with this as if it were a REST Endpoint, but now it can get
@@ -22,11 +22,11 @@ class BitMEXWebsocket:
     # Don't grow a table larger than this amount. Helps cap memory usage.
     MAX_TABLE_LEN = 200
 
-    def __init__(self, endpoint, symbol, onMsgMethod4mex,api_key=None, api_secret=None):
+    def __init__(self, endpoint, symbol, onMsgMethod,api_key=None, api_secret=None):
         '''Connect to the websocket and initialize data stores.'''
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Initializing WebSocket.")
-        self.onMsgMethod4mex=onMsgMethod4mex
+        self.onMsgMethod=onMsgMethod
         self.endpoint = endpoint
         self.symbol = symbol
 
@@ -185,7 +185,7 @@ class BitMEXWebsocket:
         '''Handler for parsing WS messages.'''
         message = json.loads(message)
         #self.logger.debug(json.dumps(message))
-        self.onMsgMethod4mex(message)
+        self.onMsgMethod(message)
         table = message['table'] if 'table' in message else None
         action = message['action'] if 'action' in message else None
         try:

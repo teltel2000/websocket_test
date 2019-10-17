@@ -27,9 +27,9 @@ logger.addHandler(handler)
 This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 """
 class RealtimeAPI(object):
-    def __init__(self, url,onMsgMethod4finex):
+    def __init__(self, url,onMsgMethod):
         self.url = url
-        self.onMsgMethod4finex=onMsgMethod4finex
+        self.onMsgMethod=onMsgMethod
         
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
@@ -62,7 +62,7 @@ class RealtimeAPI(object):
     # when we get message
     def on_message(self, ws, message):
         self.data = json.loads(message)
-        self.onMsgMethod4finex(self.data)
+        self.onMsgMethod(self.data)
         #logger.info(output)
 
     # when error occurs

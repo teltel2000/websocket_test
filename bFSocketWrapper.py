@@ -15,7 +15,7 @@ handler.setLevel(INFO)
 logger.setLevel(INFO)
 logger.addHandler(handler)
 #初期設定
-
+data_bF = []
 
 #API認証
 
@@ -23,9 +23,9 @@ logger.addHandler(handler)
 This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 """
 class RealtimeAPI(object):
-    def __init__(self, url, onMsgMethod4bF):
+    def __init__(self, url, onMsgMethod):
         self.url = url
-        self.onMsgMethod4bF = onMsgMethod4bF
+        self.onMsgMethod = onMsgMethod
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -58,7 +58,7 @@ class RealtimeAPI(object):
     def on_message(self, ws, message):
 
         self.data = json.loads(message)#websocket受信イベント
-        self.onMsgMethod4bF(self.data)
+        self.onMsgMethod(self.data)
         #logger.info(output)
 
     # when error occurs
