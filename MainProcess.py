@@ -25,17 +25,20 @@ with open(r'your_api-data_path',"r") as f:
     finex_api["key"] = api_data["finex"]["key"]
     finex_api["secret"] = api_data["finex"]["secret"]
 """
+
+"""各Wrapperから流れてきたデータのログを貯める"""
 data_bF = []
 data_mex = []
 data_finex = []
-a = 0
+
+
+"""各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
+
 def onMsgMethod4bF(message):
     global data_bF
     if data_bF
     data_bF.append(message)
     data_mex.pop(0)
-
-
     #print(message)
 def onMsgMethod4mex(message):
     global data_mex
@@ -49,15 +52,22 @@ def onMsgMethod4finex(message):
     if len(data_finex) > 1000:
         data_finex.pop(0)
     #print(message)
+
+
+"""websocketの呼び出し""
+この時、このモジュール内で定義したメソッドを指定してやることで、ラッパー側にimportさせる必要がなくなり、
+またメソッド内のデータも共有される。
+ただ、共有されたデータをメソッドから出す方法はglobal化する方法しか知らない。
+"""
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
 mex = bitmex_websocket.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=bitmex_websocket.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
 finex = bitfinex_websocket.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
 
-"""
-メインモジュールに動きがない状態で一定時間がたつと落ちるみたいなのでループを回す?
 
-上記dictに突っ込んでると止まらないみたい
-それから、変数参照するときはEventオブジェクト使うといいかも
+"""各websocketの稼働""
+メインモジュールに動きがない状態で一定時間がたつと落ちるみたいなのでループを回す?
+配列に突っ込んでると止まらないみたい
+それから、変数参照するときはEventオブジェクト使うといいかも？
 """
 #def Allrun():
 bF.run()
