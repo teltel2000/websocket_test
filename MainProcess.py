@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import sys
 import json
 import websocket
@@ -30,20 +29,20 @@ with open(r'your_api-data_path',"r") as f:
 data_bF = []
 data_mex = []
 data_finex = []
-
+log_count = 1000    #ログ記録量
 
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
     global data_bF
-    if data_bF
     data_bF.append(message)
-    data_mex.pop(0)
+    if len(data_bF) > 1000:
+        data_mex.pop(0)
     #print(message)
 def onMsgMethod4mex(message):
     global data_mex
     data_mex.append(message)
-    if len(data_mex) > 1000:
+    if len(data_mex) > log_count:
         data_mex.pop(0)
     #print(message)
 def onMsgMethod4finex(message):
@@ -60,8 +59,8 @@ def onMsgMethod4finex(message):
 ただ、共有されたデータをメソッドから出す方法はglobal化する方法しか知らない。
 """
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
-mex = bitmex_websocket.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=bitmex_websocket.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
-finex = bitfinex_websocket.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
+mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
+finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
 
 
 """各websocketの稼働""
