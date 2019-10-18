@@ -6,8 +6,8 @@ import json
 import websocket
 import time
 import bFSocketWrapper
-import bitmex_websocket
-import bitfinex_websocket
+import mexSocketWrapper
+import finexSocketWrapper
 import threading
 
 bF_api = {}
@@ -50,8 +50,8 @@ def onMsgMethod4finex(message):
         data_finex.pop(0)
     #print(message)
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
-mex = bitmex_websocket.BitMEXWebsocket(endpoint=bitmex_websocket.BitMEXWebsocket.endpoint,symbol=bitmex_websocket.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
-finex = bitfinex_websocket.RealtimeAPI(url=bitfinex_websocket.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
+mex = bitmex_websocket.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=bitmex_websocket.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
+finex = bitfinex_websocket.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
 
 """
 メインモジュールに動きがない状態で一定時間がたつと落ちるみたいなのでループを回す?
