@@ -4,12 +4,30 @@ Created on Wed Oct 16 08:35:37 2019
 
 @author: TELTEL
 """
+import sys
+import json
 import websocket
 import time
 import bFSocketWrapper
 import bitmex_websocket
 import bitfinex_websocket
 import threading
+
+bF_api = {}
+mex_api = {}
+finex_api = {}
+
+"""API key secretの読み込み"""
+"""
+with open(r'your_api-data_path',"r") as f:
+    api_data = json.loads(f)
+    bF_api["key"] = api_data["bf"]["key"]
+    bF_api["secret"] = api_data["bf"]["secret"]
+    mex_api["key"] = api_data["mex"]["key"]
+    mex_api["secret"] = api_data["mex"]["secret"]
+    finex_api["key"] = api_data["finex"]["key"]
+    finex_api["secret"] = api_data["finex"]["secret"]
+"""
 data_bF = []
 data_mex = []
 data_finex = [] 
