@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Oct 16 08:35:37 2019
 
-@author: TELTEL
-"""
+
 import sys
 import json
 import websocket
@@ -30,13 +27,15 @@ with open(r'your_api-data_path',"r") as f:
 """
 data_bF = []
 data_mex = []
-data_finex = [] 
+data_finex = []
 a = 0
 def onMsgMethod4bF(message):
     global data_bF
     if data_bF
-    data_bF.append(message)       
-    
+    data_bF.append(message)
+    data_mex.pop(0)
+
+
     #print(message)
 def onMsgMethod4mex(message):
     global data_mex
@@ -74,5 +73,5 @@ finex.run()
                 if data_bF[-1]["params"]["message"][i]["side"] == "BUY":
                     if data_bF[-1]["params"]["message"][i]["size"] > 1:
                         print("買います")
-"""       
+"""
 #threading.Thread(target=Allrun())

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 26 07:42:49 2018
 
-@author:teltel
-"""
 
 import requests
 import csv
@@ -29,14 +25,14 @@ class RealtimeAPI(object):
         self.url = url
         self.channel = channel
         self.channel2 = channel2
-        
+
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
 
     def run(self):
         #ws has loop. To break this press ctrl + c to occur Keyboard Interruption Exception.
-        self.ws.run_forever()   
+        self.ws.run_forever()
         logger.info('Web Socket process ended.')
         recconect_switch = 1
         time.sleep(5)
@@ -52,7 +48,7 @@ class RealtimeAPI(object):
         if output["params"]["channel"] == "lightning_executions_FX_BTC_JPY":
             hours = int(output["params"]["message"][0]["exec_date"][11]+output["params"]["message"][0]["exec_date"][12])
             days = int(output["params"]["message"][0]["exec_date"][8]+output["params"]["message"][0]["exec_date"][9])
-            months = int(output["params"]["message"][0]["exec_date"][5]+output["params"]["message"][0]["exec_date"][6]) 
+            months = int(output["params"]["message"][0]["exec_date"][5]+output["params"]["message"][0]["exec_date"][6])
             years = int(output["params"]["message"][0]["exec_date"][0]+output["params"]["message"][0]["exec_date"][1]+output["params"]["message"][0]["exec_date"][0]+output["params"]["message"][0]["exec_date"][2]+output["params"]["message"][0]["exec_date"][0]+output["params"]["message"][0]["exec_date"][3])
             if hours < 4:
                 y = 1
@@ -68,7 +64,7 @@ class RealtimeAPI(object):
                 y = 6
             number = len(output["params"]["message"])
             x = str(years)+"_" + str(months)+"_" + str(days)+"_" + str(y)
-        
+
             with open("C:\\Users\\"+x+".csv", "a") as f :
                 writer = csv.writer(f,lineterminator="\n")
                 for i in range(0,number):
@@ -80,7 +76,7 @@ class RealtimeAPI(object):
                                 output["params"]["message"][i]["size"],
                                 output["params"]["message"][i]["buy_child_order_acceptance_id"],
                                 output["params"]["message"][i]["sell_child_order_acceptance_id"])
-                                
+
                                 )
 
     # when error occurs
@@ -106,7 +102,7 @@ class RealtimeAPI(object):
         )
         ws.send(output_json)
         ws.send(output_json2)
-            
+
 if __name__ == '__main__':
     #API endpoint
     url = 'wss://ws.lightstream.bitflyer.com/json-rpc'
@@ -124,4 +120,3 @@ if __name__ == '__main__':
             recconect_switch = 0
             print("再接続します")
             recconect_switch = json_rpc.run()
-    

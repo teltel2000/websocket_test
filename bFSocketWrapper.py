@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
-
 import threading
 import json
 import time
@@ -46,9 +44,9 @@ class RealtimeAPI(object):
             self.logger.error("Couldn't connect to WS! Exiting.")
             self.exit()
             raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
-        
-        
-          
+
+
+
         logger.info('Web Socket process ended.')
         time.sleep(5)
     """
@@ -85,10 +83,7 @@ class RealtimeAPI(object):
 
         ws.send(output_json)
         ws.send(output_json2)
-        
+
     url = 'wss://ws.lightstream.bitflyer.com/json-rpc'
     channel = 'lightning_executions_FX_BTC_JPY'
     channel2 = "lightning_board_FX_BTC_JPY"
-
-
-

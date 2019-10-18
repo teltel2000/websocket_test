@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 26 07:42:49 2018
 
-@author: motoi
-"""
 
 import requests
 import csv
@@ -30,7 +26,7 @@ class RealtimeAPI(object):
     def __init__(self, url,onMsgMethod):
         self.url = url
         self.onMsgMethod=onMsgMethod
-        
+
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -51,9 +47,9 @@ class RealtimeAPI(object):
             self.logger.error("Couldn't connect to WS! Exiting.")
             self.exit()
             raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
-        
-        
-          
+
+
+
         logger.info('Web Socket process ended.')
         time.sleep(5)
     """
@@ -76,14 +72,14 @@ class RealtimeAPI(object):
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')
-        
+
         output_json = json.dumps(
             {'event' : 'subscribe',
             'channel' : "trades",
             "symbol" : "tBTCUSD"
             }
         )
-        
+
         output_json2 = json.dumps(
             {'event' : 'subscribe',
             'channel' : "book",
@@ -94,10 +90,9 @@ class RealtimeAPI(object):
                 {"event":"subscribe",
                  "channel":"ticker",
                  "symbol":"tBTCUSD"})
-        
+
         ws.send(output_json)
         ws.send(output_json2)
         ws.send(output_json3)
-        
+
     url = 'wss://api-pub.bitfinex.com/ws/2'
-    

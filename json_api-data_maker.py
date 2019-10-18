@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Oct 18 07:14:42 2019
 
-@author: motoi
-"""
 
 import json
 
