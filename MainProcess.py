@@ -26,16 +26,20 @@ with open(r'your_api-data_path',"r") as f:
     finex_api["secret"] = api_data["finex"]["secret"]
 """
 
+
 """各Wrapperから流れてきたデータのログを貯める"""
 data_bF = {"exe":{"full":[],"price":[],"size":[]},"board":[]}
 data_mex = []
 data_finex = []
 log_count = 1000    #ログ記録量
-exe_data = {"price":[],"size":[]}
+
 
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
+    """exectionをfull price sizeに分けた""
+    また、sizeはショートの場合マイナス化した"""
+
     if "lightning_executions_FX_BTC_JPY" in message["params"].values():
         data_bF["exe"]["full"].append(message)
         data_bF["exe"]["price"].append(message["params"]["message"][-1]["price"])
@@ -43,6 +47,11 @@ def onMsgMethod4bF(message):
             data_bF["exe"]["full"][-1]["params"]["message"][-1]["size"] *= -1
         data_bF["exe"]["size"].append(message["params"]["message"][-1]["size"])
         print(str(data_bF["exe"]["price"][-1])+"____"+str(data_bF["exe"]["size"][-1]))
+
+        """↓とりあえず置いてるだけ"""
+        print("executionsを発見しました")
+        bF_exe_ev.set()
+
     elif "lightning_board_FX_BTC_JPY" in message["params"].values():
         data_bF["board"].append(message)
     #print(len(data_bF))
@@ -52,11 +61,7 @@ def onMsgMethod4bF(message):
         data_bF["board"].pop(0)
     #number = len(data_bF[-1])
     #for i in range(0,number):
-
-    if "lightning_executions_FX_BTC_JPY" in message["params"].values():
-        print("executionsを発見しました")
-        bF_exe_ev.set()
-        #Switch.switch_set
+    #Switch.switch_set
 
     #print(data_bF[-1])
 def onMsgMethod4mex(message):
@@ -90,18 +95,17 @@ mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket
 finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
 
 
-"""各websocketの稼働""
+"""
 メインモジュールに動きがない状態で一定時間がたつと落ちるみたいなのでループを回す?
 配列に突っ込んでると止まらないみたい
 それから、変数参照するときはEventオブジェクト使うといいかも？
 """
-#def Allrun():
-#x = Switch()
-#Switch.switch_wait()
 bF_exe_ev=threading.Event()
-bF_exe_th=threading.Thread(target=bF_exe_f)
-bF_exe_th.start()
-print("ugoita")
+bF_exe_th1=threading.Thread(target=bF_exe_f)
+bF_exe_th1.start()
+
+
+"""websocketの稼働"""
 bF.run()
 mex.get_instrument()
 finex.run()
