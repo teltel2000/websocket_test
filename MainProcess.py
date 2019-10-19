@@ -38,23 +38,24 @@ def onMsgMethod4bF(message):
     data_bF.append(message)
     if len(data_bF) > 1000:
         data_mex.pop(0)
-    print(data_bF[-1])
+    #print(data_bF[-1])
 def onMsgMethod4mex(message):
     data_mex.append(message)
     if len(data_mex) > 1000:
         data_mex.pop(0)
-    print(data_mex[-1])
+    #print(data_mex[-1])
 def onMsgMethod4finex(message):
     data_finex.append(message)
     if len(data_finex) > 1000:
         data_finex.pop(0)
-    print(data_finex[-1])
+    #print(data_finex[-1])
 
 
 """websocketの呼び出し""
 この時、このモジュール内で定義したメソッドを指定してやることで、ラッパー側にimportさせる必要がなくなり、
 またメソッド内のデータも共有される。
 ただ、共有されたデータをメソッドから出す方法はglobal化する方法しか知らない。
+↑globalしなくてもよかった
 """
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
 mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
@@ -70,6 +71,7 @@ finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,on
 bF.run()
 mex.get_instrument()
 finex.run()
+print(data_bF[-1])
 
 """
     if len(data_bF) > 1000:
