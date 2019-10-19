@@ -36,19 +36,55 @@ log_count = 1000    #ログ記録量
 
 def onMsgMethod4bF(message):
     data_bF.append(message)
-    if len(data_bF) > 1000:
-        data_mex.pop(0)
+    print(len(data_bF))
+    if len(data_bF) > log_count:
+        data_bF.pop(0)
+    if len(data_bF)%20 == 0:
+        print("setsimasune")
+        aaaa.set()
+        #Switch.switch_set
+
     #print(data_bF[-1])
 def onMsgMethod4mex(message):
     data_mex.append(message)
-    if len(data_mex) > 1000:
+    if len(data_mex) > log_count:
         data_mex.pop(0)
     #print(data_mex[-1])
 def onMsgMethod4finex(message):
     data_finex.append(message)
-    if len(data_finex) > 1000:
+    if len(data_finex) > log_count:
         data_finex.pop(0)
     #print(data_finex[-1])
+
+"""eventの処理をこっちで行いたくて、スイッチをWrapperに置きたい""
+waitが欲しがってるselfがそれを包むメソッドのことなら、とりあえずこちらで
+waitを含むメソッドを定義してやって向こうで呼び出してやる？
+
+インスタンス化されてるwaitが望んでるselfはthreading.Event()のことでよかった
+で、threading.Event()の入ってる変数名でどこのスレッドをwaitしてsetするか判別してるっぽい
+めっちゃ便利
+"""
+"""
+class Switch:
+    def switch_wait():
+        print("switch_off")
+        x.threading.Event.wait()
+        print("switch_on")
+
+    def switch_set():
+        threading.Event.set()
+"""
+def lll():
+    print("hajime")
+    while True:
+        aaaa.wait()
+        print("owari")
+        aaaa.clear()
+def kkk():
+    print("kottihadou?")
+    cccc.wait()
+    print("kottimoowarunkai")
+    cccc.clear()
 
 
 """websocketの呼び出し""
@@ -68,19 +104,43 @@ finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,on
 それから、変数参照するときはEventオブジェクト使うといいかも？
 """
 #def Allrun():
+#x = Switch()
+#Switch.switch_wait()
+aaaa=threading.Event()
+cccc=threading.Event()
+bbbb = threading.Thread(target=lll)
+dddd=threading.Thread(target=kkk)
+bbbb.start()
+dddd.start()
+print("ugoita")
 bF.run()
 mex.get_instrument()
 finex.run()
-print(data_bF[-1])
 
+print("wait")
+time.sleep(60)
+print("end")
+"""データ成型の具体的な必要性、イメージがわかないのでまずこっちで全部やってみる"""
+#if threading.Event.is_set("params" in data_bF):
+    #print("getdata")
 """
-    if len(data_bF) > 1000:
-        data_bF.pop(0)
-    if threading.Event.is_set("params" in data_bF):
         if threading.Event.is_set(len(data_bF[-1]["params"]["message"]) > 2):
             for i in range(0,len(data_bF[-1]["params"]["message"])):
                 if data_bF[-1]["params"]["message"][i]["side"] == "BUY":
                     if data_bF[-1]["params"]["message"][i]["size"] > 1:
                         print("買います")
 """
+
+
+
+
+
+
+
+
+
+
+
+
+
 #threading.Thread(target=Allrun())
