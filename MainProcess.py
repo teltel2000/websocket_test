@@ -27,21 +27,35 @@ with open(r'your_api-data_path',"r") as f:
 """
 
 """各Wrapperから流れてきたデータのログを貯める"""
-data_bF = []
+data_bF = {"exe":{"full":[],"price":[],"size":[]},"board":[]}
 data_mex = []
 data_finex = []
 log_count = 1000    #ログ記録量
+exe_data = {"price":[],"size":[]}
 
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
-    data_bF.append(message)
-    print(len(data_bF))
-    if len(data_bF) > log_count:
-        data_bF.pop(0)
-    if len(data_bF)%20 == 0:
-        print("setsimasune")
-        aaaa.set()
+    if "lightning_executions_FX_BTC_JPY" in message["params"].values():
+        data_bF["exe"]["full"].append(message)
+        data_bF["exe"]["price"].append(message["params"]["message"][-1]["price"])
+        if message["params"]["message"][-1]["side"] == "SELL":
+            data_bF["exe"]["full"][-1]["params"]["message"][-1]["size"] *= -1
+        data_bF["exe"]["size"].append(message["params"]["message"][-1]["size"])
+        print(str(data_bF["exe"]["price"][-1])+"____"+str(data_bF["exe"]["size"][-1]))
+    elif "lightning_board_FX_BTC_JPY" in message["params"].values():
+        data_bF["board"].append(message)
+    #print(len(data_bF))
+    if len(data_bF["exe"]["full"]) > log_count:
+        data_bF["exe"]["full"].pop(0)
+    elif len(data_bF["board"]) > log_count:
+        data_bF["board"].pop(0)
+    #number = len(data_bF[-1])
+    #for i in range(0,number):
+
+    if "lightning_executions_FX_BTC_JPY" in message["params"].values():
+        print("executionsを発見しました")
+        bF_exe_ev.set()
         #Switch.switch_set
 
     #print(data_bF[-1])
@@ -56,50 +70,21 @@ def onMsgMethod4finex(message):
         data_finex.pop(0)
     #print(data_finex[-1])
 
-"""eventの処理をこっちで行いたくて、スイッチをWrapperに置きたい""
-waitが欲しがってるselfがそれを包むメソッドのことなら、とりあえずこちらで
-waitを含むメソッドを定義してやって向こうで呼び出してやる？
-
-インスタンス化されてるwaitが望んでるselfはthreading.Event()のことでよかった
-で、threading.Event()の入ってる変数名でどこのイベントをwaitしてsetするか判別してるっぽい
-
-流れ
-変数名=threading.Event()でeventに名前を付けてやる(event毎で判別できるようにするため)
-変数名.wait()の入った関数を定義してやる(一度waitをスルーしたらclear()でフラグをリセットしてやらないといけない)
-定義した関数を名前つけた別スレッド建ててやる(new_thread = threading.Thread(target=関数))、んで回してやる(new_thread.start())
-この時、targetする関数に()を付けない。関数じゃなくてメソッドだから？ちょっと曖昧(いずれにせよ関数を指定するときは（）付けない。多分メソッドとして扱ってるから)
-で、イベントを起こしたい場所で変数名.set()を置いてやる。この時set()の変数名とスルーさせたいwait()の変数名は同じ
-
+"""eventの処理をこっちで行いたくて、スイッチをWrapperに置きたい"""
+"""
+変数は絶え間なく更新されているので整理せずに条件分けに突っ込むと途中で変わって紛れ込む
 """
 """
-class Switch:
-    def switch_wait():
-        print("switch_off")
-        x.threading.Event.wait()
-        print("switch_on")
-
-    def switch_set():
-        threading.Event.set()
+ってか以下のデータ成型はイベントスレッド内で行う必要ないな
 """
-def lll():
-    print("hajime")
+def bF_exe_f():
+    print("bitFlyer_lightning_executions")
     while True:
-        aaaa.wait()
-        print("owari")
-        aaaa.clear()
-def kkk():
-    print("kottihadou?")
-    cccc.wait()
-    print("kottimoowarunkai")
-    cccc.clear()
+        bF_exe_ev.wait()
+        time.sleep(30)
+        bF_exe_ev.clear()
 
-
-"""websocketの呼び出し""
-この時、このモジュール内で定義したメソッドを指定してやることで、ラッパー側にimportさせる必要がなくなり、
-またメソッド内のデータも共有される。
-ただ、共有されたデータをメソッドから出す方法はglobal化する方法しか知らない。
-↑globalしなくてもよかった
-"""
+"""websocketの呼び出し"""
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
 mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
 finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
@@ -113,12 +98,9 @@ finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,on
 #def Allrun():
 #x = Switch()
 #Switch.switch_wait()
-aaaa=threading.Event()
-cccc=threading.Event()
-bbbb = threading.Thread(target=lll)
-dddd=threading.Thread(target=kkk)
-bbbb.start()
-dddd.start()
+bF_exe_ev=threading.Event()
+bF_exe_th=threading.Thread(target=bF_exe_f)
+bF_exe_th.start()
 print("ugoita")
 bF.run()
 mex.get_instrument()
