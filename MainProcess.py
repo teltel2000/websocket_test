@@ -9,6 +9,7 @@ import mexSocketWrapper
 import finexSocketWrapper
 import threading
 
+
 bF_api = {}
 mex_api = {}
 finex_api = {}
@@ -34,23 +35,20 @@ log_count = 1000    #ログ記録量
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
-    global data_bF
     data_bF.append(message)
     if len(data_bF) > 1000:
         data_mex.pop(0)
-    #print(message)
+    print(data_bF[-1])
 def onMsgMethod4mex(message):
-    global data_mex
     data_mex.append(message)
-    if len(data_mex) > log_count:
+    if len(data_mex) > 1000:
         data_mex.pop(0)
-    #print(message)
+    print(data_mex[-1])
 def onMsgMethod4finex(message):
-    global data_finex
     data_finex.append(message)
     if len(data_finex) > 1000:
         data_finex.pop(0)
-    #print(message)
+    print(data_finex[-1])
 
 
 """websocketの呼び出し""
