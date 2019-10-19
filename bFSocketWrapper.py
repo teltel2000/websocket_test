@@ -24,31 +24,35 @@ class RealtimeAPI(object):
     def __init__(self, url, onMsgMethod):
         self.url = url
         self.onMsgMethod = onMsgMethod
+        self.rerun_flag = "OFF"
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
 
     def run(self):
         #ws has loop. To break this press ctrl + c to occur Keyboard Interruption Exception.
-        self.wst = threading.Thread(target=lambda: self.ws.run_forever())
-        self.wst.daemon = True
-        self.wst.start()
-        logger.debug("Started thread")
+        while True:
+            if self.rerun_flag == "OFF":
+                self.wst = threading.Thread(target=lambda: self.ws.run_forever())
+                self.wst.daemon = True
+                self.wst.start()
+                logger.debug("Started thread")
+                self.rerun_flag = "ON"
+            # Wait for connect before continuing
+            conn_timeout = 5
+            while not self.ws.sock or not self.ws.sock.connected and conn_timeout:
+                sleep(1)
+                conn_timeout -= 1
+            if not conn_timeout:
+                self.logger.error("Couldn't connect to WS! Exiting.")
+                self.exit()
+                self.rerun_flag = "OFF"
+                raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
-        # Wait for connect before continuing
-        conn_timeout = 5
-        while not self.ws.sock or not self.ws.sock.connected and conn_timeout:
-            sleep(1)
-            conn_timeout -= 1
-        if not conn_timeout:
-            self.logger.error("Couldn't connect to WS! Exiting.")
-            self.exit()
-            raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
 
-
-        logger.info('Web Socket process ended.')
-        time.sleep(5)
+            #logger.info('Web Socket process ended.')
+            time.sleep(5)
     """
     Below are callback functions of websocket.
     """
