@@ -37,8 +37,8 @@ log_count = 1000    #ログ記録量
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
-    """exectionをfull price sizeに分けた""
-    また、sizeはショートの場合マイナス化した"""
+    """exectionの成型"""
+    """full price sizeに分けて、sizeはショートの場合マイナス化"""
 
     if "lightning_executions_FX_BTC_JPY" in message["params"].values():
         data_bF["exe"]["full"].append(message)
@@ -52,16 +52,18 @@ def onMsgMethod4bF(message):
         print("executionsを発見しました")
         bF_exe_ev.set()
 
+
+    """boardの成型"""
     elif "lightning_board_FX_BTC_JPY" in message["params"].values():
         data_bF["board"].append(message)
     #print(len(data_bF))
+
+    """logはとりあえず1000程貯める(全然少ない)"""
     if len(data_bF["exe"]["full"]) > log_count:
         data_bF["exe"]["full"].pop(0)
     elif len(data_bF["board"]) > log_count:
         data_bF["board"].pop(0)
-    #number = len(data_bF[-1])
-    #for i in range(0,number):
-    #Switch.switch_set
+
 
     #print(data_bF[-1])
 def onMsgMethod4mex(message):
