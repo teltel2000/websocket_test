@@ -26,21 +26,14 @@ with open(r'your_api-data_path',"r") as f:
     finex_api["secret"] = api_data["finex"]["secret"]
 """
 def round1000(num):
-
     num = int(num)
     if int(str(num)[-3])>4:
         num += 1000
-    while str(num)[-3] != "0":
-        num -= 1
-        
-    while str(num)[-2] != "0":
-        num -= 1
-        
-        
-    while str(num)[-1] != "0":
-        num -= 1
-    return num    
-        
+    for i in range(-3,0):
+        while str(num)[i] != "0":
+            num -= 1
+    return num
+
 
 """各Wrapperから流れてきたデータのログを貯める"""
 """
@@ -49,7 +42,7 @@ price 価格
 size ロングを正、ショートを負とした瞬間出来高
 absize 絶対値のsize
 """
-data_bF = {"exe":{"full":[],"price":[],"size":[],"absize":[]},"board":[]} 
+data_bF = {"exe":{"full":[],"price":[],"size":[],"absize":[]},"board":[]}
 data_mex = []
 data_finex = []
 log_count = 1000    #ログ記録量
@@ -86,12 +79,12 @@ def onMsgMethod4bF(message):
         print("test")
         print("vppnum")
         for i in range(0,vppnum):
-            
+
             pricelist.append(round1000(data_bF["exe"]["price"][i]))
             print(pricelist[i])
             if pricelist[i] in vppdictsize:
                 vppdictsize[pricelist[i]] += data_bF["exe"]["size"][i]
-                
+
                 vppdictabsize[pricelist[i]] += data_bF["exe"]["absize"][i]
                 print("vppdictabsize")
             else:
@@ -109,7 +102,7 @@ def onMsgMethod4bF(message):
         if len(vpp["size"]) > 3000:
             vpp["size"].pop(0)
             vpp["absize"].pop(0)
-        
+
         """boardの成型"""
     elif "lightning_board_FX_BTC_JPY" in message["params"].values():
         data_bF["board"].append(message)
