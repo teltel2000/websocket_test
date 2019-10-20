@@ -25,37 +25,95 @@ with open(r'your_api-data_path',"r") as f:
     finex_api["key"] = api_data["finex"]["key"]
     finex_api["secret"] = api_data["finex"]["secret"]
 """
+def round1000(num):
 
+    num = int(num)
+    if int(str(num)[-3])>4:
+        num += 1000
+    while str(num)[-3] != "0":
+        num -= 1
+        
+    while str(num)[-2] != "0":
+        num -= 1
+        
+        
+    while str(num)[-1] != "0":
+        num -= 1
+    return num    
+        
 
 """各Wrapperから流れてきたデータのログを貯める"""
-data_bF = {"exe":{"full":[],"price":[],"size":[]},"board":[]}
+"""
+full 生データまんま
+price 価格
+size ロングを正、ショートを負とした瞬間出来高
+absize 絶対値のsize
+"""
+data_bF = {"exe":{"full":[],"price":[],"size":[],"absize":[]},"board":[]} 
 data_mex = []
 data_finex = []
 log_count = 1000    #ログ記録量
-
+vpp = {"size":[],"absize":[]} #5min volume per price
 
 """各ラッパーからデータを持ってくる(成型追加するかも)メソッド"""
 
 def onMsgMethod4bF(message):
     """exectionの成型"""
     """full price sizeに分けて、sizeはショートの場合マイナス化"""
-
+    number = len(message["params"]["message"])
     if "lightning_executions_FX_BTC_JPY" in message["params"].values():
         data_bF["exe"]["full"].append(message)
-        data_bF["exe"]["price"].append(message["params"]["message"][-1]["price"])
+        for i in range(0,number):
+            data_bF["exe"]["price"].append(message["params"]["message"][i]["price"])
+            data_bF["exe"]["absize"].append(message["params"]["message"][i]["size"])
         if message["params"]["message"][-1]["side"] == "SELL":
             data_bF["exe"]["full"][-1]["params"]["message"][-1]["size"] *= -1
-        data_bF["exe"]["size"].append(message["params"]["message"][-1]["size"])
-        print(str(data_bF["exe"]["price"][-1])+"____"+str(data_bF["exe"]["size"][-1]))
+        for i in range(0,number):
+            data_bF["exe"]["size"].append(data_bF["exe"]["full"][-1]["params"]["message"][-1]["size"])
+        #print(str(data_bF["exe"]["price"][-1])+"____"+str(data_bF["exe"]["size"][-1]))
 
         """↓とりあえず置いてるだけ"""
-        print("executionsを発見しました")
+        #print("executionsを発見しました")
         bF_exe_ev.set()
-
-
-    """boardの成型"""
+        print(len(data_bF["exe"]["price"]))
+    elif len(data_bF["exe"]["price"])>1000:
+        vppdictsize = {}
+        vppdictabsize = {}
+        lastrap = {}
+        lastrapab = {}
+        pricelist = []
+        vppnum = len(data_bF["exe"]["price"])
+        print("test")
+        print("vppnum")
+        for i in range(0,vppnum):
+            
+            pricelist.append(round1000(data_bF["exe"]["price"][i]))
+            print(pricelist[i])
+            if pricelist[i] in vppdictsize:
+                vppdictsize[pricelist[i]] += data_bF["exe"]["size"][i]
+                
+                vppdictabsize[pricelist[i]] += data_bF["exe"]["absize"][i]
+                print("vppdictabsize")
+            else:
+                vppdictsize[pricelist[i]] = data_bF["exe"]["size"][i]
+                vppdictabsize[pricelist[i]] = data_bF["exe"]["absize"][i]
+            #print(vppdictsize)
+            #print(vppdictabsize)
+        lastrap[time.time()] = vppdictsize
+        lastrapab[time.time()] = vppdictabsize
+        vpp["size"].append(lastrap)
+        vpp["absize"].append(lastrapab)
+        data_bF["exe"]["price"].clear()
+        data_bF["exe"]["size"].clear()
+        print(vpp)
+        if len(vpp["size"]) > 3000:
+            vpp["size"].pop(0)
+            vpp["absize"].pop(0)
+        
+        """boardの成型"""
     elif "lightning_board_FX_BTC_JPY" in message["params"].values():
         data_bF["board"].append(message)
+        #print(message)
     #print(len(data_bF))
 
     """logはとりあえず1000程貯める(全然少ない)"""

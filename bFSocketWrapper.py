@@ -70,7 +70,7 @@ class RealtimeAPI(object):
     # when websocket closed.
     def on_close(self, ws):
         logger.info('disconnected streaming server')
-
+        self.run()
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')
