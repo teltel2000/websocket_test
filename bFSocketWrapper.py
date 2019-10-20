@@ -45,9 +45,9 @@ class RealtimeAPI(object):
                 conn_timeout -= 1
             if not conn_timeout:
                 self.logger.error("Couldn't connect to WS! Exiting.")
-                self.exit()
+                #self.exit()
                 self.rerun_flag = "OFF"
-                raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
+                #raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
 
 
