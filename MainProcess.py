@@ -9,7 +9,6 @@ import mexSocketWrapper
 import finexSocketWrapper
 import threading
 
-
 bF_api = {}
 mex_api = {}
 finex_api = {}
@@ -86,7 +85,7 @@ def onMsgMethod4bF(message):
                 vppdictsize[pricelist[i]] += data_bF["exe"]["size"][i]
 
                 vppdictabsize[pricelist[i]] += data_bF["exe"]["absize"][i]
-                print("vppdictabsize")
+
             else:
                 vppdictsize[pricelist[i]] = data_bF["exe"]["size"][i]
                 vppdictabsize[pricelist[i]] = data_bF["exe"]["absize"][i]
@@ -99,6 +98,7 @@ def onMsgMethod4bF(message):
         data_bF["exe"]["price"].clear()
         data_bF["exe"]["size"].clear()
         print(vpp)
+        print("___________________________________________________________")
         if len(vpp["size"]) > 3000:
             vpp["size"].pop(0)
             vpp["absize"].pop(0)
@@ -167,20 +167,30 @@ def Allrun():
     while True:
         print(1)
         runev.wait()
-        print(2)
+        print("connect websocket")
         if not runswitch["bf"]:
+            print("bf接続します")
             runswitch["bf"]=bF.run()
+            print(999999)
+        else:
+            print("bf接続できてない")
         if not runswitch["mex"]:
+            print("mex接続します")
             runswitch["mex"]=mex.get_instrument()
+        else:
+            print("mex接続できてない")
         if not runswitch["finex"]:
+            print("finex接続します")
             runswitch["finex"]=finex.run()
-        runevent.clear()
+        else:
+            print("finex接続できてない")
+        runev.clear()
 allrun = threading.Thread(target=Allrun)
 allrun.start()
 runev.set()
 
 print("wait")
-time.sleep(60)
+time.sleep(12000)
 print("end")
 """データ成型の具体的な必要性、イメージがわかないのでまずこっちで全部やってみる"""
 #if threading.Event.is_set("params" in data_bF):

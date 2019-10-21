@@ -59,7 +59,9 @@ class BitMEXWebsocket:
 
     def exit(self):
         '''Call this to exit - will close websocket.'''
+        self.runevent
         self.exited = True
+        print("mex_runevent_set")
         self.ws.close()
 
     def get_instrument(self):
@@ -253,7 +255,8 @@ class BitMEXWebsocket:
     def __on_close(self, ws):
         '''Called on websocket close.'''
         self.logger.info('Websocket Closed')
-        self.runevent.set()
+        self.runevent
+        print("atclose_mex_runevent_set")
     endpoint = "https://www.bitmex.com/api/v1"
     symbol = "XBTUSD"
 

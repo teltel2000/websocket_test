@@ -31,28 +31,26 @@ class RealtimeAPI(object):
         websocket.enableTrace(True)
     def run(self):
         #ws has loop. To break this press ctrl + c to occur Keyboard Interruption Exception.
-        while True:
-            if self.rerun_flag == "OFF":
-                self.wst = threading.Thread(target=lambda: self.ws.run_forever())
-                self.wst.daemon = True
-                self.wst.start()
-                logger.debug("Started thread")
-                self.rerun_flag = "ON"
-            # Wait for connect before continuing
-            conn_timeout = 30
-            while not self.ws.sock or not self.ws.sock.connected and conn_timeout:
+        self.wst = threading.Thread(target=lambda: self.ws.run_forever())
+        self.wst.daemon = True
+        self.wst.start()
+        logger.debug("Started thread")
+        self.rerun_flag = "ON"
+        # Wait for connect before continuing
+        conn_timeout = 30
+        while not self.ws.sock or not self.ws.sock.connected and conn_timeout:
                 sleep(1)
                 conn_timeout -= 1
-            if not conn_timeout:
+        if not conn_timeout:
                 self.logger.error("Couldn't connect to WS! Exiting.")
-                #self.exit()
+                self.exit()
                 self.rerun_flag = "OFF"
                 #raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
 
 
             #logger.info('Web Socket process ended.')
-            time.sleep(5)
+        time.sleep(5)
     """
     Below are callback functions of websocket.
     """
@@ -69,7 +67,9 @@ class RealtimeAPI(object):
 
     # when websocket closed.
     def on_close(self, ws):
+        self.runevent
         logger.info('disconnected streaming server')
+        print("bitFlyer_runevent_set")
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')

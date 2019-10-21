@@ -34,13 +34,12 @@ class RealtimeAPI(object):
 
     def run(self):
         #ws has loop. To break this press ctrl + c to occur Keyboard Interruption Exception.
-        while True:
-            if self.rerun_flag == "OFF":
-                self.wst = threading.Thread(target=lambda: self.ws.run_forever())
-                self.wst.daemon = True
-                self.wst.start()
-                logger.debug("Started thread")
-                self.rerun_flag = "ON"
+
+            self.wst = threading.Thread(target=lambda: self.ws.run_forever())
+            self.wst.daemon = True
+            self.wst.start()
+            logger.debug("Started thread")
+            self.rerun_flag = "ON"
 
             # Wait for connect before continuing
             conn_timeout = 5
@@ -74,7 +73,8 @@ class RealtimeAPI(object):
     # when websocket closed.
     def on_close(self, ws):
         logger.info('disconnected streaming server')
-        self.runevent.set()
+        self.runevent
+        print("finex_runevent_set")
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')
