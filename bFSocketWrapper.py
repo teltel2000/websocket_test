@@ -21,11 +21,11 @@ data_bF = []
 This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 """
 class RealtimeAPI(object):
-    def __init__(self, url, onMsgMethod):
+    def __init__(self, url, onMsgMethod,runevent):
         self.url = url
         self.onMsgMethod = onMsgMethod
         self.rerun_flag = "OFF"
-
+        self.runevent = runevent
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -70,8 +70,6 @@ class RealtimeAPI(object):
     # when websocket closed.
     def on_close(self, ws):
         logger.info('disconnected streaming server')
-        self.rerun_flag = "ON"
-        self.run()
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')

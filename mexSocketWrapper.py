@@ -24,14 +24,14 @@ class BitMEXWebsocket:
     # Don't grow a table larger than this amount. Helps cap memory usage.
     MAX_TABLE_LEN = 200
 
-    def __init__(self, endpoint, symbol, onMsgMethod,api_key=None, api_secret=None):
+    def __init__(self, endpoint, symbol ,runevent,onMsgMethod,api_key=None, api_secret=None):
         '''Connect to the websocket and initialize data stores.'''
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Initializing WebSocket.")
         self.onMsgMethod=onMsgMethod
         self.endpoint = endpoint
         self.symbol = symbol
-
+        self.runevent = runevent
         if api_key is not None and api_secret is None:
             raise ValueError('api_secret is required if api_key is provided')
         if api_key is None and api_secret is not None:
@@ -253,6 +253,7 @@ class BitMEXWebsocket:
     def __on_close(self, ws):
         '''Called on websocket close.'''
         self.logger.info('Websocket Closed')
+        self.runevent.set()
     endpoint = "https://www.bitmex.com/api/v1"
     symbol = "XBTUSD"
 

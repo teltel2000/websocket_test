@@ -81,7 +81,7 @@ def onMsgMethod4bF(message):
         for i in range(0,vppnum):
 
             pricelist.append(round1000(data_bF["exe"]["price"][i]))
-            print(pricelist[i])
+            print(len(pricelist))
             if pricelist[i] in vppdictsize:
                 vppdictsize[pricelist[i]] += data_bF["exe"]["size"][i]
 
@@ -141,11 +141,13 @@ def bF_exe_f():
         bF_exe_ev.wait()
         time.sleep(30)
         bF_exe_ev.clear()
-
+runev = threading.Event()
+def runevent():
+    runev.set()
 """websocketの呼び出し"""
-bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
-mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
-finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
+bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF,runevent = runevent)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
+mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex,runevent = runevent)
+finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex,runevent = runevent)
 
 
 """
@@ -158,10 +160,24 @@ bF_exe_th1=threading.Thread(target=bF_exe_f)
 bF_exe_th1.start()
 
 
-"""websocketの稼働"""
-bF.run()
-mex.get_instrument()
-finex.run()
+"""websocketの稼働""
+接続が途切れた後に自動で再接続する"""
+def Allrun():
+    runswitch = {"bf":False,"mex":False,"finex":False}
+    while True:
+        print(1)
+        runev.wait()
+        print(2)
+        if not runswitch["bf"]:
+            runswitch["bf"]=bF.run()
+        if not runswitch["mex"]:
+            runswitch["mex"]=mex.get_instrument()
+        if not runswitch["finex"]:
+            runswitch["finex"]=finex.run()
+        runevent.clear()
+allrun = threading.Thread(target=Allrun)
+allrun.start()
+runev.set()
 
 print("wait")
 time.sleep(60)
