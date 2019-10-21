@@ -24,6 +24,8 @@ with open(r'your_api-data_path',"r") as f:
     finex_api["key"] = api_data["finex"]["key"]
     finex_api["secret"] = api_data["finex"]["secret"]
 """
+
+"""1000円台に丸めたい"""
 def round1000(num):
     num = int(num)
     if int(str(num)[-3])>4:
@@ -68,6 +70,8 @@ def onMsgMethod4bF(message):
         #print("executionsを発見しました")
         bF_exe_ev.set()
         print(len(data_bF["exe"]["price"]))
+
+        """1000約定ごとの価格別出来高"""
     elif len(data_bF["exe"]["price"])>1000:
         vppdictsize = {}
         vppdictabsize = {}
@@ -128,19 +132,18 @@ def onMsgMethod4finex(message):
         data_finex.pop(0)
     #print(data_finex[-1])
 
-"""eventの処理をこっちで行いたくて、スイッチをWrapperに置きたい"""
+
 """
 変数は絶え間なく更新されているので整理せずに条件分けに突っ込むと途中で変わって紛れ込む
 """
-"""
-ってか以下のデータ成型はイベントスレッド内で行う必要ないな
-"""
+
 def bF_exe_f():
     print("bitFlyer_lightning_executions")
     while True:
         bF_exe_ev.wait()
         time.sleep(30)
         bF_exe_ev.clear()
+"""websocketの再接続に使いたい"""
 runev = threading.Event()
 def runevent():
     runev.set()
@@ -171,7 +174,7 @@ def Allrun():
         if not runswitch["bf"]:
             print("bf接続します")
             runswitch["bf"]=bF.run()
-            print(999999)
+            #print(999999)
         else:
             print("bf接続できてない")
         if not runswitch["mex"]:
