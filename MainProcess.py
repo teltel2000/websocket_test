@@ -143,10 +143,14 @@ def bF_exe_f():
         bF_exe_ev.wait()
         time.sleep(30)
         bF_exe_ev.clear()
+
+
 """websocketの再接続に使いたい"""
 runev = threading.Event()
 def runevent():
     runev.set()
+
+
 """websocketの呼び出し"""
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF,runevent = runevent)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
 mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex,runevent = runevent)
@@ -164,11 +168,13 @@ bF_exe_th1.start()
 
 
 """websocketの稼働""
-接続が途切れた後に自動で再接続する"""
+接続が途切れた後に自動で再接続する
+考え中でまだ成立してない"""
 def Allrun():
     runswitch = {"bf":False,"mex":False,"finex":False}
     while True:
-        print(1)
+        s = 0
+        print(s)
         runev.wait()
         print("connect websocket")
         if not runswitch["bf"]:
@@ -188,6 +194,8 @@ def Allrun():
         else:
             print("finex接続できてない")
         runev.clear()
+        s+=1
+        
 allrun = threading.Thread(target=Allrun)
 allrun.start()
 runev.set()
