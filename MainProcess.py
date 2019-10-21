@@ -172,8 +172,9 @@ bF_exe_th1.start()
 考え中でまだ成立してない"""
 def Allrun():
     runswitch = {"bf":False,"mex":False,"finex":False}
+    s = 0
     while True:
-        s = 0
+
         print(s)
         runev.wait()
         print("connect websocket")
@@ -195,7 +196,7 @@ def Allrun():
             print("finex接続できてない")
         runev.clear()
         s+=1
-        
+
 allrun = threading.Thread(target=Allrun)
 allrun.start()
 runev.set()
