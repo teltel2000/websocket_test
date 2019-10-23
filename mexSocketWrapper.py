@@ -1,5 +1,5 @@
 
-
+import time
 import websocket
 import threading
 import traceback
@@ -24,14 +24,13 @@ class BitMEXWebsocket:
     # Don't grow a table larger than this amount. Helps cap memory usage.
     MAX_TABLE_LEN = 200
 
-    def __init__(self, endpoint, symbol ,runevent,onMsgMethod,api_key=None, api_secret=None):
+    def __init__(self, endpoint, symbol ,onMsgMethod,api_key=None, api_secret=None):
         '''Connect to the websocket and initialize data stores.'''
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Initializing WebSocket.")
         self.onMsgMethod=onMsgMethod
         self.endpoint = endpoint
         self.symbol = symbol
-        self.runevent = runevent
         if api_key is not None and api_secret is None:
             raise ValueError('api_secret is required if api_key is provided')
         if api_key is None and api_secret is not None:
@@ -59,9 +58,7 @@ class BitMEXWebsocket:
 
     def exit(self):
         '''Call this to exit - will close websocket.'''
-        self.runevent
         self.exited = True
-        print("mex_runevent_set")
         self.ws.close()
 
     def get_instrument(self):
@@ -132,7 +129,7 @@ class BitMEXWebsocket:
         if not conn_timeout:
             self.logger.error("Couldn't connect to WS! Exiting.")
             self.exit()
-            raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
+            #raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
     def __get_auth(self):
         '''Return auth headers. Will use API Keys if present in settings.'''
@@ -246,7 +243,10 @@ class BitMEXWebsocket:
         '''Called on fatal websocket errors. We exit on these.'''
         if not self.exited:
             self.logger.error("Error : %s" % error)
-            raise websocket.WebSocketException(error)
+            #raise websocket.WebSocketException(error)
+        print("reconnect")
+        if not self.ws.sock:
+            self.reconnect()
 
     def __on_open(self, ws):
         '''Called when the WS opens.'''
@@ -255,8 +255,24 @@ class BitMEXWebsocket:
     def __on_close(self, ws):
         '''Called on websocket close.'''
         self.logger.info('Websocket Closed')
-        self.runevent
-        print("atclose_mex_runevent_set")
+        print("reconnect")
+        if not self.ws.sock:
+            self.reconnect()
+            
+    def reconnect(self,**kwargs):
+       # if not self.ws.sock:
+        print(self.ws.sock)
+        #print(self.ws.sock.connected)
+        if self.ws.sock:
+            self.ws.sock.close(**kwargs)
+        print(self.ws.sock)
+        if self.restart < 5:
+            self.restart += 1
+        print(self.restart)
+        time.sleep(self.restart)
+        #self.ws.sock = None
+        self.run()            
+
     endpoint = "https://www.bitmex.com/api/v1"
     symbol = "XBTUSD"
 

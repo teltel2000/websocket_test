@@ -23,11 +23,10 @@ logger.addHandler(handler)
 This program calls Bitflyer real time API JSON-RPC2.0 over Websocket
 """
 class RealtimeAPI(object):
-    def __init__(self, url,onMsgMethod,runevent):
+    def __init__(self, url,onMsgMethod):
         self.url = url
         self.onMsgMethod=onMsgMethod
         self.rerun_flag = "OFF"
-        self.runevent = runevent
         #Define Websocket
         self.ws = websocket.WebSocketApp(self.url,header=None,on_open=self.on_open, on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         websocket.enableTrace(True)
@@ -51,7 +50,7 @@ class RealtimeAPI(object):
                 self.logger.error("Couldn't connect to WS! Exiting.")
                 self.exit()
                 self.rerun_flag = "OFF"
-                raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
+                #raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
 
 
@@ -69,12 +68,15 @@ class RealtimeAPI(object):
     # when error occurs
     def on_error(self, ws, error):
         logger.error(error)
-
+        print("reconnect")
+        if not self.ws.sock:
+            self.reconnect()
     # when websocket closed.
     def on_close(self, ws):
         logger.info('disconnected streaming server')
-        self.runevent
-        print("finex_runevent_set")
+        print("reconnect")
+        if not self.ws.sock:
+            self.reconnect()
     # when websocket opened.
     def on_open(self, ws):
         logger.info('connected streaming server')
@@ -96,9 +98,23 @@ class RealtimeAPI(object):
                 {"event":"subscribe",
                  "channel":"ticker",
                  "symbol":"tBTCUSD"})
-
+    
         ws.send(output_json)
         ws.send(output_json2)
         ws.send(output_json3)
+        
+    def reconnect(self,**kwargs):
+       # if not self.ws.sock:
+        print(self.ws.sock)
+        #print(self.ws.sock.connected)
+        if self.ws.sock:
+            self.ws.sock.close(**kwargs)
+        print(self.ws.sock)
+        if self.restart < 5:
+            self.restart += 1
+        print(self.restart)
+        time.sleep(self.restart)
+        #self.ws.sock = None
+        self.run()
 
     url = 'wss://api-pub.bitfinex.com/ws/2'

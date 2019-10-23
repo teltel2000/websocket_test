@@ -69,7 +69,7 @@ def onMsgMethod4bF(message):
         """↓とりあえず置いてるだけ"""
         #print("executionsを発見しました")
         bF_exe_ev.set()
-        print(len(data_bF["exe"]["price"]))
+        #print(len(data_bF["exe"]["price"]))
 
         """1000約定ごとの価格別出来高"""
     elif len(data_bF["exe"]["price"])>1000:
@@ -101,7 +101,7 @@ def onMsgMethod4bF(message):
         vpp["absize"].append(lastrapab)
         data_bF["exe"]["price"].clear()
         data_bF["exe"]["size"].clear()
-        #print(vpp)
+        print(vpp)
         print("___________________________________________________________")
         if len(vpp["size"]) > 3000:
             vpp["size"].pop(0)
@@ -153,8 +153,8 @@ def runevent():
 
 """websocketの呼び出し"""
 bF = bFSocketWrapper.RealtimeAPI(url=bFSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4bF)#ここで指定したonMethodoによる変数の移動が難しい、変数というか受信データ
-mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex,runevent = runevent)
-finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex,runevent = runevent)
+mex = mexSocketWrapper.BitMEXWebsocket(endpoint=mexSocketWrapper.BitMEXWebsocket.endpoint,symbol=mexSocketWrapper.BitMEXWebsocket.symbol,onMsgMethod=onMsgMethod4mex)
+finex = finexSocketWrapper.RealtimeAPI(url=finexSocketWrapper.RealtimeAPI.url,onMsgMethod=onMsgMethod4finex)
 
 
 """

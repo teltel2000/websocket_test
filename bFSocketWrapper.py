@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-
+import requests
 import threading
 import json
 import time
 import websocket
 from time import sleep
 from logging import getLogger,INFO,StreamHandler
+
+
 #import MainProcess
 logger = getLogger(__name__)
 handler = StreamHandler()
@@ -14,6 +16,7 @@ logger.setLevel(INFO)
 logger.addHandler(handler)
 #初期設定
 data_bF = []
+
 
 #API認証
 
@@ -44,6 +47,7 @@ class RealtimeAPI(object):
         if not conn_timeout:
                 self.logger.error("Couldn't connect to WS! Exiting.")
                 self.exit()
+                #self.reconnect()
                 self.rerun_flag = "OFF"
                 #raise websocket.WebSocketTimeoutException('Couldn\'t connect to WS! Exiting.')
 
@@ -63,17 +67,19 @@ class RealtimeAPI(object):
 
     # when error occurs
     def on_error(self, ws, error):
-        logger.error(error)
+        print(error)
         print("reconnect")
-        self.reconnect()
+        if not self.ws.sock:
+            self.reconnect()
     # when websocket closed.
     def on_close(self, ws):
         logger.info('disconnected streaming server')
         print("reconnect")
-        self.reconnect()
+        if not self.ws.sock:
+            self.reconnect()
     # when websocket opened.
     def on_open(self, ws):
-        logger.info('connected streaming server')
+        print('connected streaming server')
         output_json = json.dumps(
             {'method' : 'subscribe',
             'params' : {'channel' : self.channel}
@@ -87,11 +93,18 @@ class RealtimeAPI(object):
 
         ws.send(output_json)
         ws.send(output_json2)
-    def reconnect(self):
+    def reconnect(self,**kwargs):
+       # if not self.ws.sock:
+        print(self.ws.sock)
+        #print(self.ws.sock.connected)
+        if self.ws.sock:
+            self.ws.sock.close(**kwargs)
+        print(self.ws.sock)
         if self.restart < 5:
             self.restart += 1
         print(self.restart)
         time.sleep(self.restart)
+        #self.ws.sock = None
         self.run()
 
 
