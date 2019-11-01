@@ -8,10 +8,12 @@ import bFSocketWrapper
 import mexSocketWrapper
 import finexSocketWrapper
 import threading
-
+import ccxt
 bF_api = {}
 mex_api = {}
 finex_api = {}
+bitflyer = ccxt.bitflyer()
+bitmex = ccxt.bitmex()
 
 """API key secretの読み込み"""
 """
@@ -101,7 +103,7 @@ def onMsgMethod4bF(message):
         vpp["absize"].append(lastrapab)
         data_bF["exe"]["price"].clear()
         data_bF["exe"]["size"].clear()
-        print(vpp)
+        #print(vpp)
         print("___________________________________________________________")
         if len(vpp["size"]) > 3000:
             vpp["size"].pop(0)
@@ -123,8 +125,22 @@ def onMsgMethod4bF(message):
     #print(data_bF[-1])
 def onMsgMethod4mex(message):
     data_mex.append(message)
+    quoteprice = [8000]
     if len(data_mex) > log_count:
         data_mex.pop(0)
+    #print(message)
+    #print(bitmex.fetch_open_orders())
+    #print(bitmex.fetch_markets())
+    #print(bitmex.fetch_ticker({"XBT"}))
+    if "table" in message:
+        if message["table"] == "quote":
+            quoteprice.append(message["data"]["bidprice"])
+            if len(quoteprice)>100:
+                quoteprice.pop(0)
+    #nowmexprice = message["types"][""]
+    if quoteprice[-1] < 8000:
+        bitmex.create_order(symbol="XBTUSD",type="limit",side="BUY",amount=2)
+        time.sleep(300)
     #print(data_mex[-1])
 def onMsgMethod4finex(message):
     data_finex.append(message)
@@ -170,39 +186,14 @@ bF_exe_th1.start()
 """websocketの稼働""
 接続が途切れた後に自動で再接続する
 考え中でまだ成立してない"""
-def Allrun():
-    runswitch = {"bf":False,"mex":False,"finex":False}
-    s = 0
-    while True:
+bF.run()
+mex.get_instrument()
+finex.run()
 
-        print(s)
-        runev.wait()
-        print("connect websocket")
-        if not runswitch["bf"]:
-            print("bf接続します")
-            runswitch["bf"]=bF.run()
-            #print(999999)
-        else:
-            print("bf接続できてない")
-        if not runswitch["mex"]:
-            print("mex接続します")
-            runswitch["mex"]=mex.get_instrument()
-        else:
-            print("mex接続できてない")
-        if not runswitch["finex"]:
-            print("finex接続します")
-            runswitch["finex"]=finex.run()
-        else:
-            print("finex接続できてない")
-        runev.clear()
-        s+=1
+print("set limit order")
+#def first_limit_orders():
 
-allrun = threading.Thread(target=Allrun)
-allrun.start()
-runev.set()
-
-print("wait")
-time.sleep(12000)
+#print(bitmex.)
 print("end")
 """データ成型の具体的な必要性、イメージがわかないのでまずこっちで全部やってみる"""
 #if threading.Event.is_set("params" in data_bF):
